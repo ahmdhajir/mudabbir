@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مُدَبِّر — تدبّر آيات القرآن الكريم</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--ink:#1a2e22;--green:#1e5c45;--green-mid:#2d7a5e;--green-lt:#e8f3ee;--gold:#b8883a;--gold-lt:#d4aa6a;--gold-pale:#f7f0e4;--parch:#faf7f2;--paper:#fff;--border:#ddd5c4;--txt-lt:#7a7060;--red:#c0392b;--shadow:0 4px 24px rgba(30,50,34,.09);--r:14px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:var(--parch);color:var(--ink);min-height:100vh;direction:rtl}
+#authScreen{min-height:100vh;background:linear-gradient(160deg,#0f2e1e,#1e5c45 60%,#2d7a5e);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo-title{font-size:1.8rem;font-weight:900;color:var(--green);letter-spacing:4px}
+.auth-logo-sub{font-size:.78rem;color:var(--txt-lt);margin-top:4px}
+.auth-tabs{display:flex;gap:4px;background:var(--parch);border-radius:10px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;background:transparent;color:var(--txt-lt);transition:all .2s}
+.auth-tab.active{background:var(--green);color:#fff}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:.78rem;font-weight:700;color:var(--txt-lt);margin-bottom:5px}
+.auth-field input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s}
+.auth-field input:focus{border-color:var(--green)}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-left:44px}
+.pass-eye{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--txt-lt)}
+.auth-error{color:var(--red);font-size:.82rem;margin-bottom:12px;min-height:18px;text-align:center}
+.auth-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px}
+.auth-btn:hover{background:var(--green-mid)}
+.auth-link{display:block;text-align:center;font-size:.82rem;color:var(--green);cursor:pointer;margin-top:6px}
+.guest-btn{width:100%;padding:10px;background:transparent;color:var(--txt-lt);border:1.5px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;cursor:pointer;margin-top:8px}
+.app-header{background:linear-gradient(160deg,#0f2e1e,#1e5c45 60%,#2d7a5e);padding:20px 24px 16px}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.header-center{text-align:center;flex:1}
+.header-bismillah{font-family:'Amiri',serif;font-size:1.4rem;color:var(--gold-lt);margin-bottom:4px}
+.header-title{font-size:1.7rem;font-weight:900;color:#fff;letter-spacing:6px}
+.header-sub{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:2px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.header-user-btn{background:none;border:none;cursor:pointer;text-align:right}
+.header-user-name{color:#fff;font-size:.88rem;font-weight:700;display:block}
+.header-points{color:var(--gold-lt);font-size:.82rem;font-weight:700;display:block}
+.header-badge{color:rgba(255,255,255,.7);font-size:.72rem;display:block}
+.header-actions{display:flex;align-items:center;gap:8px}
+.header-logout{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:.78rem;cursor:pointer}
+.notif-btn{position:relative;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:1.1rem;color:#fff}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:.6rem;font-weight:900;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif}
+.header-ornament{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px}
+.header-ornament::before,.header-ornament::after{content:'';height:1px;flex:1;max-width:100px;background:linear-gradient(90deg,transparent,rgba(184,136,58,.5))}
+.header-ornament span{color:var(--gold);font-size:.9rem;letter-spacing:4px}
+.nav-bar{display:flex;gap:8px;padding:12px 16px;background:var(--paper);border-bottom:1px solid var(--border);overflow-x:auto}
+.nav-btn{white-space:nowrap;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--parch);color:var(--ink);font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .18s}
+.nav-btn:hover,.nav-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.container{max-width:820px;margin:0 auto;padding:32px 20px 60px}
+.verse-card{background:var(--paper);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:28px}
+.verse-card-head{background:linear-gradient(135deg,#1a3d2c,#1e5c45);border-radius:var(--r) var(--r) 0 0;padding:13px 20px;display:flex;align-items:center;justify-content:space-between}
+.verse-card-head-label{color:rgba(255,255,255,.9);font-size:.88rem;font-weight:700}
+.verse-badge{background:var(--gold);color:#fff;font-size:.72rem;font-weight:700;padding:3px 12px;border-radius:20px}
+.verse-card-body{padding:24px}
+.field-label{display:block;font-size:.78rem;font-weight:700;color:var(--txt-lt);margin-bottom:7px;text-transform:uppercase}
+.surah-wrap{position:relative;margin-bottom:18px}
+.surah-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.97rem;outline:none;transition:border-color .2s}
+.surah-input:focus{border-color:var(--green)}
+.surah-drop{position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:2px solid var(--green);border-radius:10px;max-height:230px;overflow-y:auto;z-index:200;display:none;box-shadow:0 12px 36px rgba(0,0,0,.14)}
+.surah-drop.open{display:block}
+.surah-opt{padding:10px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.92rem;border-bottom:1px solid #f5f5f5}
+.surah-opt:hover{background:var(--green-lt)}
+.surah-opt-num{font-size:.72rem;color:var(--gold);font-weight:700;background:var(--gold-pale);padding:2px 8px;border-radius:10px}
+.ayah-input{width:140px;padding:13px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:1rem;outline:none;text-align:center;font-weight:700;color:var(--green);margin-bottom:18px}
+.ayah-input:focus{border-color:var(--green)}
+.verse-display{background:linear-gradient(135deg,var(--gold-pale),#f0e9d8);border:1px solid #d9c9a8;border-radius:12px;padding:24px 28px;margin-bottom:22px;min-height:80px;text-align:center;font-family:'Amiri',serif;font-size:1.55rem;line-height:2.3;color:#1a3020;direction:rtl}
+.topic-entry{background:var(--parch);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px}
+.topic-entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.topic-entry-title{font-size:.78rem;font-weight:700;color:var(--green);text-transform:uppercase}
+.topic-select{width:100%;padding:11px 16px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.93rem;background:#fff;outline:none;cursor:pointer;margin-bottom:12px}
+.topic-select:focus{border-color:var(--green)}
+.explanation-textarea{width:100%;min-height:130px;padding:14px 16px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.95rem;resize:vertical;outline:none;direction:rtl;line-height:1.9}
+.explanation-textarea:focus{border-color:var(--green)}
+.btn{padding:10px 20px;border:none;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:7px}
+.btn-green{background:var(--green);color:#fff}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-outline-green{background:transparent;color:var(--green);border:2px solid var(--green)}
+.btn-ghost{background:transparent;color:var(--txt-lt);border:1.5px solid var(--border)}
+.btn-sm{padding:6px 13px;font-size:.78rem;border-radius:7px}
+.btn-red-sm{background:rgba(192,57,43,.1);color:var(--red);border:none;padding:5px 12px;font-size:.76rem;border-radius:6px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700}
+.card-footer{padding:14px 24px;background:#faf9f7;border-top:1px solid var(--border);border-radius:0 0 var(--r) var(--r);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.main-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;padding:24px;background:var(--paper);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow)}
+.page-view{display:none;min-height:100vh}
+.page-header{background:linear-gradient(160deg,#0f2e1e,#1e5c45);padding:18px 28px;display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}
+.page-header-title{color:#fff;font-size:1.2rem;font-weight:700;flex:1;text-align:center}
+.wall-card{background:var(--paper);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px}
+.wall-card-head{background:linear-gradient(135deg,#1a3d2c,#1e5c45);border-radius:var(--r) var(--r) 0 0;padding:12px 18px;display:flex;justify-content:space-between;align-items:center}
+.wall-card-body{padding:18px}
+.like-btn{background:var(--parch);border:1.5px solid var(--border);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:700;color:var(--ink)}
+.like-btn.liked{background:#fde8e8;border-color:#e8b4ae;color:var(--red)}
+.lb-row{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--paper);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.lb-row.lb-me{border-color:var(--gold);background:var(--gold-pale)}
+.lb-rank{font-size:1.3rem;width:32px;text-align:center}
+.admin-stat-box{background:var(--paper);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:16px;text-align:center}
+.admin-stat-num{font-size:2rem;font-weight:900;color:var(--green)}
+.admin-stat-label{font-size:.82rem;color:var(--txt-lt);margin-top:4px}
+.admin-user-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--paper);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.admin-section-title{font-size:.78rem;font-weight:700;color:var(--txt-lt);letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px}
+.admin-msg-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.93rem;outline:none;margin-bottom:10px;direction:rtl}
+.user-checkbox{width:18px;height:18px;cursor:pointer;accent-color:var(--green)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a3020;color:#fff;padding:12px 26px;border-radius:30px;font-size:.88rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.modal-box{background:#fff;border-radius:16px;padding:32px;max-width:400px;width:100%;text-align:center}
+.modal-icon{font-size:2.2rem;margin-bottom:14px}
+.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.modal-sub{font-size:.88rem;color:var(--txt-lt);line-height:1.7;margin-bottom:24px}
+.modal-btns{display:flex;gap:10px;justify-content:center}
+#lbPopup{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.lb-popup-box{background:#fff;border-radius:20px;padding:28px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#adminMsgBanner{display:none;background:var(--gold-pale);border-bottom:2px solid var(--gold);padding:10px 20px;text-align:center;font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer}
+.pdf-progress{position:fixed;inset:0;background:rgba(15,46,30,.85);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--txt-lt)}
+.empty-state-icon{font-size:3rem;margin-bottom:14px}
+/* NOTIFICATIONS */
+.notif-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.notif-item:hover{background:var(--green-lt)}
+.notif-item.unread{background:#f0f8f4;border-right:3px solid var(--green)}
+.notif-item.notif-special{background:var(--gold-pale);border-right:3px solid var(--gold)}
+.notif-time{font-size:.72rem;color:var(--txt-lt);margin-top:4px}
+/* PROFILE */
+.profile-avatar{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:#fff;margin:0 auto 16px}
+.profile-stat{text-align:center;padding:16px;background:var(--paper);border:1px solid var(--border);border-radius:10px}
+.profile-stat-num{font-size:1.4rem;font-weight:900;color:var(--green)}
+.profile-stat-label{font-size:.75rem;color:var(--txt-lt);margin-top:4px}
+.edit-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.93rem;outline:none;margin-bottom:12px;direction:rtl}
+.edit-input:focus{border-color:var(--green)}
+@media(max-width:600px){.container{padding:16px 10px 40px}.verse-card-body{padding:14px}}
+/* DARK MODE */
+body.dark{--ink:#e8f3ee;--green:#4caf82;--green-mid:#3d9e72;--green-lt:#1a3020;--gold:#d4aa6a;--gold-lt:#b8883a;--gold-pale:#2a2010;--parch:#0f1a14;--paper:#1a2e22;--border:#2d4a35;--txt-lt:#8aaa94;--red:#e57373;--shadow:0 4px 24px rgba(0,0,0,.4)}
+body.dark .auth-box{background:#1a2e22;color:#e8f3ee}
+body.dark .surah-drop{background:#1a2e22;border-color:#4caf82}
+body.dark .surah-opt:hover{background:#2d4a35}
+body.dark .modal-box{background:#1a2e22}
+body.dark .lb-popup-box{background:#1a2e22}
+body.dark .auth-field input{background:#0f1a14;color:#e8f3ee;border-color:#2d4a35}
+body.dark .edit-input{background:#0f1a14;color:#e8f3ee;border-color:#2d4a35}
+body.dark .admin-msg-input{background:#0f1a14;color:#e8f3ee;border-color:#2d4a35}
+body.dark .explanation-textarea{background:#0f1a14;color:#e8f3ee;border-color:#2d4a35}
+body.dark .topic-select{background:#0f1a14;color:#e8f3ee;border-color:#2d4a35}
+body.dark .notif-item.unread{background:#1a3020}
+body.dark #adminMsgBanner{background:#2a2010;border-color:var(--gold)}
+.dark-btn{background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:1rem;color:#fff}
+/* WELCOME MODAL */
+.welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.welcome-box{background:#fff;border-radius:24px;padding:36px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+body.dark .welcome-box{background:#1a2e22}
+</style>
+</head>
+<body>
+<div id="adminMsgBanner" onclick="this.style.display='none'"></div>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div style="font-family:'Amiri',serif;font-size:1.4rem;color:var(--gold-lt)">﷽</div>
+      <div class="auth-logo-title">مُدَبِّر</div>
+      <div class="auth-logo-sub">أداة تدبّر آيات القرآن الكريم</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">تسجيل الدخول</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">حساب جديد</button>
+    </div>
+    <div id="loginForm">
+      <div class="auth-field"><label>الإيميل أو اسم المستخدم</label><input type="text" id="loginEmail" placeholder="email أو username"></div>
+      <div class="auth-field"><label>كلمة السر</label><div class="pass-wrap"><input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"><button class="pass-eye" onclick="togglePass('loginPass',this)" type="button">👁</button></div></div>
+      <div class="auth-error" id="authError"></div>
+      <button class="auth-btn" onclick="doLogin()">دخول</button>
+      <span class="auth-link" onclick="doForgotPassword()">نسيت كلمة السر؟</span>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="auth-field"><label>الاسم</label><input type="text" id="regName" placeholder="اسمك الكامل"></div>
+      <div class="auth-field"><label>اسم المستخدم</label><input type="text" id="regUsername" placeholder="username بالإنجليزي"></div>
+      <div class="auth-field"><label>الإيميل</label><input type="email" id="regEmail" placeholder="email@example.com"></div>
+      <div class="auth-field"><label>كلمة السر</label><div class="pass-wrap"><input type="password" id="regPass" placeholder="6 أحرف على الأقل" onkeydown="if(event.key==='Enter')doRegister()"><button class="pass-eye" onclick="togglePass('regPass',this)" type="button">👁</button></div></div>
+      <div class="auth-error" id="authError2"></div>
+      <button class="auth-btn" onclick="doRegister()">إنشاء حساب</button>
+    </div>
+    <button class="guest-btn" onclick="enterAsGuest()">🚶 دخول كضيف (بدون حفظ)</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appRoot" style="display:none">
+
+  <!-- MAIN -->
+  <div id="mainView">
+    <div class="app-header">
+      <div class="header-top">
+        <div class="header-actions">
+          <button class="header-logout" onclick="doLogout()">خروج</button>
+        </div>
+        <div class="header-center">
+          <div class="header-bismillah">﷽</div>
+          <div class="header-title">مُدَبِّر</div>
+          <div class="header-sub">أداة تدبّر وفهم آيات القرآن الكريم</div>
+        </div>
+        <div class="header-right">
+          <div style="display:flex;gap:5px;justify-content:flex-end;margin-bottom:4px">
+            <button class="notif-btn" onclick="showNotifications()" id="notifBtn">🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
+            <button class="dark-btn" onclick="toggleDark()" id="darkBtn">🌙</button>
+            <button class="dark-btn" onclick="showAbout()">ℹ️</button>
+          </div>
+          <button class="header-user-btn" onclick="showProfile()">
+            <span class="header-user-name" id="headerUserName"></span>
+            <span class="header-points" id="headerPoints"></span>
+            <span class="header-badge" id="headerBadge"></span>
+          </button>
+        </div>
+      </div>
+      <div class="header-ornament"><span>✦ ✦ ✦</span></div>
+    </div>
+    <div class="nav-bar">
+      <button class="nav-btn active" onclick="setNavActive(this)">📖 تدبّر</button>
+      <button class="nav-btn" onclick="setNavActive(this);showPublicWall()">🌍 ما تم تدبّره</button>
+      <button class="nav-btn" onclick="setNavActive(this);showLeaderboard()">🏆 Leaderboard</button>
+      <button class="nav-btn" onclick="setNavActive(this);showTopicsView()">⊞ المواضيع</button>
+      <button class="nav-btn" id="adminBtn" style="display:none;background:var(--gold);color:#fff;border-color:var(--gold)" onclick="showAdminPanel()">⚙️ Admin</button>
+    </div>
+    <div class="container">
+      <div id="versesContainer"></div>
+      <div style="text-align:center;margin-bottom:24px"><button class="btn btn-outline-green" onclick="addVerseCard()">＋ إضافة آية جديدة</button></div>
+      <div class="main-actions">
+        <button class="btn btn-gold" onclick="downloadPDF()">↓ تحميل PDF</button>
+        <button class="btn btn-green" onclick="confirmReset()">↺ تحديث</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div id="notifView" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('notifView')">← رجوع</button>
+      <div class="page-header-title">🔔 الإشعارات</div>
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="clearAllNotifs()">مسح الكل</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profileView" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('profileView')">← رجوع</button>
+      <div class="page-header-title">👤 حسابي</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:600px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div class="profile-avatar" id="profileAvatar"></div>
+        <div style="font-size:1.2rem;font-weight:900;color:var(--ink)" id="profileName"></div>
+        <div style="font-size:.85rem;color:var(--txt-lt);margin-top:4px" id="profileUsername"></div>
+        <div style="font-size:.8rem;color:var(--txt-lt);margin-top:2px" id="profileJoined"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px">
+        <div class="profile-stat"><div class="profile-stat-num" id="profilePoints">0</div><div class="profile-stat-label">إجمالي النقاط</div></div>
+        <div class="profile-stat"><div class="profile-stat-num" id="profileTadCount">0</div><div class="profile-stat-label">تدبّرات</div></div>
+        <div class="profile-stat"><div class="profile-stat-num" id="profileLikes">0</div><div class="profile-stat-label">إعجابات</div></div>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:20px;text-align:center">
+        <div id="profileBadgeIcon" style="font-size:2rem"></div>
+        <div id="profileBadgeName" style="font-weight:700;color:var(--green);margin-top:6px"></div>
+        <div style="font-size:.78rem;color:var(--txt-lt);margin-top:4px">الشارة الحالية</div>
+      </div>
+      <div id="firstTadBadge" style="display:none;background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--r);padding:16px;margin-bottom:20px;text-align:center">
+        <div style="font-size:1.5rem">🏅</div>
+        <div style="font-weight:700;color:var(--gold);margin-top:6px">شارة أول تدبّر</div>
+        <div style="font-size:.78rem;color:var(--txt-lt);margin-top:4px">بدأت رحلة التدبّر!</div>
+      </div>
+      <!-- EDIT SECTION -->
+      <div class="admin-section-title">تعديل البيانات</div>
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:20px">
+        <label class="field-label">اسم المستخدم الجديد</label>
+        <input class="edit-input" id="editUsername" placeholder="username جديد">
+        <button class="btn btn-green btn-sm" onclick="updateUsername()">تحديث اسم المستخدم</button>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:20px">
+        <label class="field-label">تغيير كلمة السر</label>
+        <input class="edit-input" type="email" id="editEmail" placeholder="إيميلك للتحقق" style="direction:ltr">
+        <button class="btn btn-green btn-sm" onclick="sendPassReset()">إرسال رابط تغيير السر</button>
+      </div>
+      <!-- MY TADABBUR -->
+      <div class="admin-section-title">تدبّراتي</div>
+      <div id="myTadList"></div>
+    </div>
+  </div>
+
+  <!-- TOPICS -->
+  <div id="topicsView" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hideTopicsView()">← رجوع</button>
+      <div class="page-header-title">مكتبة المواضيع</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:600px">
+      <div id="topicsManageList"></div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <input id="newTopicInput" type="text" placeholder="اكتب موضوعاً جديداً..." style="flex:1;padding:12px 16px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.93rem;outline:none" onkeydown="if(event.key==='Enter')addTopic()">
+        <button class="btn btn-green" onclick="addTopic()">إضافة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUBLIC WALL -->
+  <div id="publicWall" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('publicWall')">← رجوع</button>
+      <div class="page-header-title">🌍 ما تم تدبّره</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:700px"><div id="wallList"></div></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="leaderboardView" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('leaderboardView')">← رجوع</button>
+      <div class="page-header-title">🏆 Leaderboard الأسبوعي</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:600px">
+      <div id="lbList"></div>
+      <div id="adminSendRanksBtn" style="display:none;margin-top:20px;text-align:center">
+        <button class="btn btn-gold" onclick="sendRanksToAll()">📢 إرسال الرانكات للجميع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="adminPanel" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('adminPanel')">← رجوع</button>
+      <div class="page-header-title">⚙️ لوحة الأدمن</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:700px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="admin-stat-box"><div class="admin-stat-num" id="adminUsersCount">—</div><div class="admin-stat-label">مستخدمون</div></div>
+        <div class="admin-stat-box"><div class="admin-stat-num" id="adminTadCount">—</div><div class="admin-stat-label">تدبّرات</div></div>
+      </div>
+      <!-- DISTRIBUTE TOOL -->
+      <div class="admin-section-title">🗂️ أداة توزيع التدبّر</div>
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px">
+        <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center">
+          <div style="flex:1">
+            <label style="font-size:.78rem;font-weight:700;color:var(--txt-lt);display:block;margin-bottom:5px">من صفحة</label>
+            <input type="number" id="distFrom" min="1" placeholder="1" style="width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.95rem;outline:none;text-align:center;font-weight:700;color:var(--green)">
+          </div>
+          <div style="font-size:1.2rem;color:var(--txt-lt);padding-top:20px">→</div>
+          <div style="flex:1">
+            <label style="font-size:.78rem;font-weight:700;color:var(--txt-lt);display:block;margin-bottom:5px">إلى صفحة</label>
+            <input type="number" id="distTo" min="1" placeholder="15" style="width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.95rem;outline:none;text-align:center;font-weight:700;color:var(--green)">
+          </div>
+        </div>
+        <p style="font-size:.8rem;color:var(--txt-lt);margin-bottom:12px">حدد المستخدمين من القائمة أدناه ثم اضغط وزّع</p>
+        <button class="btn btn-green" onclick="distributeTadabbur()" style="width:100%;justify-content:center">🗂️ وزّع</button>
+        <div id="distResult" style="display:none;margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-size:.88rem;font-weight:700;color:var(--green)">نتيجة التوزيع</span>
+            <button class="btn btn-sm btn-outline-green" onclick="copyDistResult()">📋 نسخ الكل</button>
+          </div>
+          <div id="distResultBody" style="background:var(--parch);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.88rem;line-height:2;direction:rtl;white-space:pre-wrap;font-family:'Cairo',sans-serif"></div>
+        </div>
+      </div>
+      <!-- SEND TO ALL -->
+      <div class="admin-section-title">إرسال رسالة</div>
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px">
+        <textarea class="admin-msg-input" id="adminMsgInput" rows="3" placeholder="اكتب رسالتك هنا..."></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="adminSendToSelected()">📢 إرسال للمختارين</button>
+          <button class="btn btn-green" onclick="adminSendToAll()">إرسال للجميع</button>
+        </div>
+      </div>
+      <!-- USERS WITH CHECKBOXES -->
+      <div class="admin-section-title">المستخدمون</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 16px;background:var(--paper);border:1px solid var(--border);border-radius:9px">
+        <input type="checkbox" class="user-checkbox" id="selectAllUsers" onchange="toggleSelectAll(this)">
+        <label for="selectAllUsers" style="font-size:.88rem;font-weight:700;cursor:pointer">تحديد الكل</label>
+      </div>
+      <div id="adminUsersList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ABOUT -->
+  <div id="aboutView" class="page-view">
+    <div class="page-header">
+      <button class="btn btn-sm btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="hidePage('aboutView')">← رجوع</button>
+      <div class="page-header-title">📖 عن مُدَبِّر</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="container" style="max-width:600px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;color:var(--gold);margin-bottom:8px">﷽</div>
+        <div style="font-size:1.4rem;font-weight:900;color:var(--green);letter-spacing:4px;margin-bottom:8px">مُدَبِّر</div>
+        <div style="font-size:.9rem;color:var(--txt-lt);line-height:1.8">أداة تساعدك على تدبّر آيات القرآن الكريم وتسجيل تأملاتك ومشاركتها</div>
+      </div>
+      <!-- HOW TO USE -->
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px">
+        <div style="font-weight:700;color:var(--green);margin-bottom:14px;font-size:1rem">🚀 كيف تستخدم التطبيق؟</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:12px;align-items:flex-start"><span style="background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">1</span><div style="font-size:.88rem;line-height:1.7;color:var(--ink)">اختر السورة واكتب رقم الآية — سيظهر نصها تلقائياً</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start"><span style="background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">2</span><div style="font-size:.88rem;line-height:1.7;color:var(--ink)">اختر موضوع التدبّر واكتب شرحك وتأملاتك</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start"><span style="background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">3</span><div style="font-size:.88rem;line-height:1.7;color:var(--ink)">اضغط "حفظ ومشاركة" لنشر تدبّرك وكسب النقاط</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start"><span style="background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">4</span><div style="font-size:.88rem;line-height:1.7;color:var(--ink)">شاهد تدبّرات الآخرين في "ما تم تدبّره" وتفاعل معهم</div></div>
+        </div>
+      </div>
+      <!-- POINTS SYSTEM -->
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px">
+        <div style="font-weight:700;color:var(--green);margin-bottom:14px;font-size:1rem">⭐ نظام النقاط</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span style="font-size:.88rem">آية بشرح واحد</span><span style="font-weight:700;color:var(--green)">+5 pts</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span style="font-size:.88rem">آية بشرحين</span><span style="font-weight:700;color:var(--green)">+7 pts</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span style="font-size:.88rem">كل شرح إضافي</span><span style="font-weight:700;color:var(--green)">+1 pt</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fde8e8;border-radius:8px"><span style="font-size:.88rem">يوم بدون تدبّر</span><span style="font-weight:700;color:var(--red)">-5 pts</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fde8e8;border-radius:8px"><span style="font-size:.88rem">اليوم التالي بدون تدبّر</span><span style="font-weight:700;color:var(--red)">-10 pts</span></div>
+        </div>
+      </div>
+      <!-- BADGES -->
+      <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:20px">
+        <div style="font-weight:700;color:var(--green);margin-bottom:14px;font-size:1rem">🏅 الشارات الشهرية</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--gold-pale);border-radius:8px"><span>🌟 المُدَبِّر الأعلى</span><span style="font-size:.82rem;color:var(--gold);font-weight:700">700+ نقطة</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span>📖 حافظ التدبّر</span><span style="font-size:.82rem;color:var(--txt-lt);font-weight:700">600+ نقطة</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span>🌿 المُتأمِّل</span><span style="font-size:.82rem;color:var(--txt-lt);font-weight:700">400+ نقطة</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span>🌱 المبتدئ</span><span style="font-size:.82rem;color:var(--txt-lt);font-weight:700">200+ نقطة</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--parch);border-radius:8px"><span>🔰 جديد</span><span style="font-size:.82rem;color:var(--txt-lt);font-weight:700">أقل من 200</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-overlay" id="welcomeOverlay" style="display:none">
+  <div class="welcome-box">
+    <div style="font-size:3rem;margin-bottom:12px">🌿</div>
+    <div style="font-family:'Amiri',serif;font-size:1.3rem;color:var(--gold);margin-bottom:8px">﷽</div>
+    <div style="font-size:1.2rem;font-weight:900;color:var(--green);margin-bottom:8px" id="welcomeName"></div>
+    <div style="font-size:.9rem;color:var(--txt-lt);line-height:1.8;margin-bottom:20px">أهلاً بك في مُدَبِّر 🎉<br>يلا ناخد حسنات مع بعض ونتدبّر كلام ربنا</div>
+    <div style="background:var(--green-lt);border-radius:12px;padding:14px;margin-bottom:20px;font-size:.85rem;color:var(--ink);line-height:1.8">
+      ابدأ باختيار سورة وآية وكتابة تدبّرك — وكسب أول 5 نقاط! ⭐
+    </div>
+    <button class="auth-btn" onclick="closeWelcome()">يلا نبدأ! 🚀</button>
+  </div>
+</div>
+<div id="lbPopup">
+  <div class="lb-popup-box">
+    <div style="font-size:2rem;text-align:center;margin-bottom:8px">🏆</div>
+    <div style="text-align:center;font-size:1.1rem;font-weight:900;margin-bottom:6px">أبطال هذا الأسبوع</div>
+    <div style="text-align:center;font-size:.8rem;color:var(--txt-lt);margin-bottom:18px">أعلى 3 في الـ Leaderboard الأسبوعي</div>
+    <div id="lbPopupBody"></div>
+    <button class="auth-btn" style="margin-top:16px" onclick="closeLbPopup()">حسناً ✓</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-btns" id="modalBtns"></div>
+  </div>
+</div>
+
+<div class="pdf-progress" id="pdfProgress">
+  <div style="font-size:3rem">📖</div>
+  <div style="color:#fff;font-size:1rem;font-weight:600" id="pdfProgressText">جارٍ إعداد الملف...</div>
+</div>
+<div id="pdfHidden" style="position:fixed;left:-10000px;top:0;width:794px"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// ══ FIREBASE ══
+const firebaseConfig={apiKey:"AIzaSyCHY0Gwvt9V5wq9NUMFCZj9JbpScxgoqlw",authDomain:"mudabbir-583.firebaseapp.com",projectId:"mudabbir-583",storageBucket:"mudabbir-583.firebasestorage.app",messagingSenderId:"1050368919079",appId:"1:1050368919079:web:9c9a514e5a903f34ceb002"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore(),FS=firebase.firestore.FieldValue;
+
+// ══ CONSTANTS ══
+const ADMIN_USERNAME="ahmed_admin";
+const ADMIN_EMAIL="hagerhager6000@gmail.com";
+const DEFAULT_TOPICS=['أسماء الله الحسنى وصفاته','عظمة الله في علمه وقدرته','رحمة الله وسعة مغفرته','آيات الترغيب والبشارة','آيات التخويف والتحذير','فضل الذكر والقرآن','فضل الدعاء والتضرع','قصص الأنبياء والعبر','آيات التوبة والإنابة','الآخرة — الجنة والنار','آيات التفكر في الكون والخلق','الإخلاص والعبودية لله','الصبر والثبات في البلاء','فضل الصلاة والطاعات','العلاقة مع القرآن الكريم'];
+const ALL_SURAHS=[{n:1,name:'الفاتحة'},{n:2,name:'البقرة'},{n:3,name:'آل عمران'},{n:4,name:'النساء'},{n:5,name:'المائدة'},{n:6,name:'الأنعام'},{n:7,name:'الأعراف'},{n:8,name:'الأنفال'},{n:9,name:'التوبة'},{n:10,name:'يونس'},{n:11,name:'هود'},{n:12,name:'يوسف'},{n:13,name:'الرعد'},{n:14,name:'إبراهيم'},{n:15,name:'الحجر'},{n:16,name:'النحل'},{n:17,name:'الإسراء'},{n:18,name:'الكهف'},{n:19,name:'مريم'},{n:20,name:'طه'},{n:21,name:'الأنبياء'},{n:22,name:'الحج'},{n:23,name:'المؤمنون'},{n:24,name:'النور'},{n:25,name:'الفرقان'},{n:26,name:'الشعراء'},{n:27,name:'النمل'},{n:28,name:'القصص'},{n:29,name:'العنكبوت'},{n:30,name:'الروم'},{n:31,name:'لقمان'},{n:32,name:'السجدة'},{n:33,name:'الأحزاب'},{n:34,name:'سبأ'},{n:35,name:'فاطر'},{n:36,name:'يس'},{n:37,name:'الصافات'},{n:38,name:'ص'},{n:39,name:'الزمر'},{n:40,name:'غافر'},{n:41,name:'فصلت'},{n:42,name:'الشورى'},{n:43,name:'الزخرف'},{n:44,name:'الدخان'},{n:45,name:'الجاثية'},{n:46,name:'الأحقاف'},{n:47,name:'محمد'},{n:48,name:'الفتح'},{n:49,name:'الحجرات'},{n:50,name:'ق'},{n:51,name:'الذاريات'},{n:52,name:'الطور'},{n:53,name:'النجم'},{n:54,name:'القمر'},{n:55,name:'الرحمن'},{n:56,name:'الواقعة'},{n:57,name:'الحديد'},{n:58,name:'المجادلة'},{n:59,name:'الحشر'},{n:60,name:'الممتحنة'},{n:61,name:'الصف'},{n:62,name:'الجمعة'},{n:63,name:'المنافقون'},{n:64,name:'التغابن'},{n:65,name:'الطلاق'},{n:66,name:'التحريم'},{n:67,name:'الملك'},{n:68,name:'القلم'},{n:69,name:'الحاقة'},{n:70,name:'المعارج'},{n:71,name:'نوح'},{n:72,name:'الجن'},{n:73,name:'المزمل'},{n:74,name:'المدثر'},{n:75,name:'القيامة'},{n:76,name:'الإنسان'},{n:77,name:'المرسلات'},{n:78,name:'النبأ'},{n:79,name:'النازعات'},{n:80,name:'عبس'},{n:81,name:'التكوير'},{n:82,name:'الانفطار'},{n:83,name:'المطففين'},{n:84,name:'الانشقاق'},{n:85,name:'البروج'},{n:86,name:'الطارق'},{n:87,name:'الأعلى'},{n:88,name:'الغاشية'},{n:89,name:'الفجر'},{n:90,name:'البلد'},{n:91,name:'الشمس'},{n:92,name:'الليل'},{n:93,name:'الضحى'},{n:94,name:'الشرح'},{n:95,name:'التين'},{n:96,name:'العلق'},{n:97,name:'القدر'},{n:98,name:'البينة'},{n:99,name:'الزلزلة'},{n:100,name:'العاديات'},{n:101,name:'القارعة'},{n:102,name:'التكاثر'},{n:103,name:'العصر'},{n:104,name:'الهمزة'},{n:105,name:'الفيل'},{n:106,name:'قريش'},{n:107,name:'الماعون'},{n:108,name:'الكوثر'},{n:109,name:'الكافرون'},{n:110,name:'النصر'},{n:111,name:'المسد'},{n:112,name:'الإخلاص'},{n:113,name:'الفلق'},{n:114,name:'الناس'}];
+
+// ══ STATE ══
+let currentUser=null,currentUserData=null,isAdmin=false;
+let topics=JSON.parse(localStorage.getItem('mdb_topics')||'null')||[...DEFAULT_TOPICS];
+let cardCounter=0,saveTimer=null;
+let allUsersCache=[];
+
+// ══ HELPERS ══
+function getBadge(p){if(p>=700)return{icon:'🌟',name:'المُدَبِّر الأعلى',color:'#b8883a'};if(p>=600)return{icon:'📖',name:'حافظ التدبّر',color:'#1e5c45'};if(p>=400)return{icon:'🌿',name:'المُتأمِّل',color:'#2d7a5e'};if(p>=200)return{icon:'🌱',name:'المبتدئ',color:'#7a7060'};return{icon:'🔰',name:'جديد',color:'#aaa'};}
+function calcPts(n){return n<=0?0:n===1?5:n===2?7:7+(n-2);}
+function getTodayStr(){return new Date().toISOString().split('T')[0];}
+function getWeekStr(){const d=new Date(),j=new Date(d.getFullYear(),0,1),w=Math.ceil(((d-j)/86400000+j.getDay()+1)/7);return `${d.getFullYear()}-W${w}`;}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/(864e5));}
+function saveToLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
+function timeAgo(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);const diff=Math.floor((Date.now()-d)/1000);if(diff<60)return'الآن';if(diff<3600)return`منذ ${Math.floor(diff/60)} دقيقة`;if(diff<86400)return`منذ ${Math.floor(diff/3600)} ساعة`;return`منذ ${Math.floor(diff/86400)} يوم`;}
+function getAvatarColor(name){const colors=['#1e5c45','#2d7a5e','#b8883a','#7a7060','#c0392b','#1a3020'];let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length];}
+
+// ══ DARK MODE ══
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  localStorage.setItem('mdb_dark',isDark?'1':'0');
+  document.getElementById('darkBtn').textContent=isDark?'☀️':'🌙';
+}
+function initDark(){
+  if(localStorage.getItem('mdb_dark')==='1'){
+    document.body.classList.add('dark');
+    document.getElementById('darkBtn').textContent='☀️';
+  }
+}
+
+// ══ WELCOME ══
+function showWelcomeIfFirst(name){
+  if(localStorage.getItem('mdb_welcomed_'+currentUser.uid))return;
+  document.getElementById('welcomeName').textContent='أهلاً '+name+' 👋';
+  document.getElementById('welcomeOverlay').style.display='flex';
+}
+function closeWelcome(){
+  document.getElementById('welcomeOverlay').style.display='none';
+  localStorage.setItem('mdb_welcomed_'+currentUser.uid,'1');
+}
+
+// ══ ABOUT ══
+function showAbout(){showPage('aboutView');}
+
+
+auth.onAuthStateChanged(async user=>{
+  if(user){
+    currentUser=user;
+    const doc=await db.collection('users').doc(user.uid).get();
+    if(doc.exists){currentUserData=doc.data();isAdmin=(currentUserData.username===ADMIN_USERNAME);}
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('appRoot').style.display='block';
+    updateHeaderUI();
+    initDark();
+    initApp();
+    checkWeeklyPopup();
+    checkInactivity();
+    loadAdminMessages();
+    loadNotifCount();
+    showWelcomeIfFirst(currentUserData?.name||'');
+  }else{
+    currentUser=null;currentUserData=null;isAdmin=false;
+    document.getElementById('authScreen').style.display='flex';
+    document.getElementById('appRoot').style.display='none';
+  }
+});
+
+// ══ AUTH FUNCTIONS ══
+function togglePass(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
+function switchTab(tab){document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';document.getElementById('tabLogin').classList.toggle('active',tab==='login');document.getElementById('tabRegister').classList.toggle('active',tab==='register');document.getElementById('authError').textContent='';}
+function enterAsGuest(){document.getElementById('authScreen').style.display='none';document.getElementById('appRoot').style.display='block';document.getElementById('headerUserName').textContent='ضيف';document.getElementById('headerPoints').textContent='—';document.getElementById('adminBtn').style.display='none';initApp();}
+
+async function doLogin(){
+  const eu=document.getElementById('loginEmail').value.trim(),pass=document.getElementById('loginPass').value,err=document.getElementById('authError');
+  if(!eu||!pass){err.textContent='اكمل البيانات';return;}
+  let email=eu;
+  if(!eu.includes('@')){try{const s=await db.collection('users').where('username','==',eu).get();if(s.empty){err.textContent='اسم المستخدم غير موجود';return;}email=s.docs[0].data().email;}catch{err.textContent='خطأ في الاتصال';return;}}
+  try{await auth.signInWithEmailAndPassword(email,pass);err.textContent='';}catch(e){err.textContent=fbErr(e.code);}
+}
+
+async function doRegister(){
+  const name=document.getElementById('regName').value.trim(),username=document.getElementById('regUsername').value.trim(),email=document.getElementById('regEmail').value.trim(),pass=document.getElementById('regPass').value,err=document.getElementById('authError2');
+  if(!name||!username||!email||!pass){err.textContent='اكمل جميع الحقول';return;}
+  if(pass.length<6){err.textContent='كلمة السر 6 أحرف على الأقل';return;}
+  try{
+    const uq=await db.collection('users').where('username','==',username).get();
+    if(!uq.empty){err.textContent='اسم المستخدم مستخدم بالفعل';return;}
+    const c=await auth.createUserWithEmailAndPassword(email,pass);
+    await c.user.updateProfile({displayName:name});
+    const b=getBadge(0);
+    await db.collection('users').doc(c.user.uid).set({name,username,email,points:0,monthlyPoints:0,totalPoints:0,lastActiveDate:getTodayStr(),inactiveDays:0,badgeName:b.name,badgeIcon:b.icon,createdAt:FS.serverTimestamp()});
+    err.textContent='';
+  }catch(e){err.textContent=fbErr(e.code);}
+}
+
+async function doForgotPassword(){
+  const eu=document.getElementById('loginEmail').value.trim(),err=document.getElementById('authError');
+  if(!eu){err.textContent='اكتب الإيميل أو اسم المستخدم أولاً';return;}
+  let email=eu;
+  if(!eu.includes('@')){const s=await db.collection('users').where('username','==',eu).get();if(s.empty){err.textContent='اسم المستخدم غير موجود';return;}email=s.docs[0].data().email;}
+  try{await auth.sendPasswordResetEmail(email);err.style.color='var(--green)';err.textContent='✓ تم إرسال رابط إعادة الضبط على إيميلك';}catch(e){err.style.color='var(--red)';err.textContent=fbErr(e.code);}
+}
+
+async function doLogout(){await auth.signOut();}
+function fbErr(c){const m={'auth/email-already-in-use':'الإيميل مسجّل بالفعل','auth/invalid-email':'الإيميل غير صحيح','auth/wrong-password':'كلمة السر غير صحيحة','auth/user-not-found':'المستخدم غير موجود','auth/too-many-requests':'حاول لاحقاً','auth/invalid-credential':'البيانات غير صحيحة'};return m[c]||'حدث خطأ، حاول تاني';}
+
+// ══ HEADER ══
+function updateHeaderUI(){
+  if(!currentUserData)return;
+  const b=getBadge(currentUserData.monthlyPoints||0);
+  document.getElementById('headerUserName').textContent=currentUserData.name||'';
+  document.getElementById('headerPoints').textContent=(currentUserData.points||0)+' pts';
+  document.getElementById('headerBadge').textContent=b.icon+' '+b.name;
+  document.getElementById('adminBtn').style.display=isAdmin?'inline-flex':'none';
+  if(isAdmin)document.getElementById('adminSendRanksBtn').style.display='block';
+}
+
+// ══ INACTIVITY (fixed - runs on open) ══
+async function checkInactivity(){
+  if(!currentUser||!currentUserData)return;
+  const today=getTodayStr(),last=currentUserData.lastActiveDate||today;
+  if(last===today)return;
+  const diff=daysBetween(last,today);
+  if(diff<=0)return;
+  let penalty=0;for(let i=1;i<=diff;i++)penalty+=5*i;
+  const np=(currentUserData.points||0)-penalty;
+  await db.collection('users').doc(currentUser.uid).update({points:np,inactiveDays:FS.increment(diff),lastActiveDate:today});
+  currentUserData.points=np;currentUserData.lastActiveDate=today;
+  updateHeaderUI();
+  toast(`⚠ خصم ${penalty} نقطة لعدم التدبّر ${diff} يوم`);
+}
+
+// ══ NOTIFICATIONS ══
+async function loadNotifCount(){
+  if(!currentUser)return;
+  const week=getWeekStr();
+  try{
+    const s=await db.collection('notifications').where('week','==',week).where('read_'+currentUser.uid,'==',false).get();
+    // count unread: all notifs not marked read by this user
+    const all=await db.collection('notifications').where('week','==',week).get();
+    let unread=0;
+    all.docs.forEach(d=>{const data=d.data();if(!data['read_'+currentUser.uid])unread++;});
+    const badge=document.getElementById('notifBadge');
+    if(unread>0){badge.style.display='flex';badge.textContent=unread>9?'9+':unread;}
+    else badge.style.display='none';
+  }catch{}
+}
+
+async function showNotifications(){
+  showPage('notifView');
+  if(!currentUser){document.getElementById('notifList').innerHTML='<div style="text-align:center;padding:40px;color:var(--txt-lt)">سجّل دخولك لرؤية الإشعارات</div>';return;}
+  document.getElementById('notifList').innerHTML='<div style="text-align:center;padding:40px;color:var(--txt-lt)">جارٍ التحميل...</div>';
+  const week=getWeekStr();
+  const s=await db.collection('notifications').where('week','==',week).orderBy('createdAt','desc').limit(50).get();
+  if(s.empty){document.getElementById('notifList').innerHTML='<div class="empty-state"><div class="empty-state-icon">🔔</div><div>لا توجد إشعارات هذا الأسبوع</div></div>';return;}
+  let html='';
+  const batch=db.batch();
+  s.docs.forEach(d=>{
+    const n=d.data(),read=n['read_'+currentUser.uid];
+    const isSpecial=n.type==='ranks';
+    const isMe=n.type==='tadabbur_self';
+    html+=`<div class="notif-item ${read?'':'unread'} ${isSpecial?'notif-special':''}" onclick="markRead('${d.id}',this)">
+      <div style="font-size:.95rem;font-weight:${read?'400':'700'}">${n.message||'إشعار جديد'}</div>
+      <div class="notif-time">${timeAgo(n.createdAt)}</div>
+    </div>`;
+    if(!read)batch.update(db.collection('notifications').doc(d.id),{['read_'+currentUser.uid]:true});
+  });
+  document.getElementById('notifList').innerHTML=html;
+  try{await batch.commit();}catch{}
+  document.getElementById('notifBadge').style.display='none';
+}
+
+async function markRead(id,el){el.classList.remove('unread');}
+
+async function clearAllNotifs(){
+  if(!currentUser)return;
+  const week=getWeekStr();
+  const s=await db.collection('notifications').where('week','==',week).get();
+  const batch=db.batch();
+  s.docs.forEach(d=>batch.update(d.ref,{['read_'+currentUser.uid]:true}));
+  await batch.commit();
+  document.getElementById('notifList').innerHTML='<div class="empty-state"><div class="empty-state-icon">🔔</div><div>تم مسح الإشعارات</div></div>';
+  document.getElementById('notifBadge').style.display='none';
+}
+
+async function addNotification(message,type='general'){
+  const week=getWeekStr();
+  await db.collection('notifications').add({message,type,week,createdAt:FS.serverTimestamp()});
+}
+
+async function addNotificationToUser(uid,message,type){
+  const week=getWeekStr();
+  await db.collection('notifications').add({message,type,week,targetUid:uid,createdAt:FS.serverTimestamp()});
+}
+
+// ══ SAVE TADABBUR ══
+async function saveTadabburToFirebase(cardEl){
+  if(!currentUser){toast('سجّل دخولك أولاً');return;}
+  const si=cardEl.querySelector('.surah-input'),ai=cardEl.querySelector('.ayah-num-input'),dp=cardEl.querySelector('.verse-display');
+  if(!si.dataset.surahName||!ai.value){toast('اختر السورة ورقم الآية أولاً');return;}
+  const topicsData=[];
+  cardEl.querySelectorAll('.topic-entry').forEach(e=>{const t=e.querySelector('.topic-select')?.value||'',ex=e.querySelector('.explanation-textarea')?.value?.trim()||'';if(ex)topicsData.push({topic:t,explanation:ex});});
+  if(!topicsData.length){toast('اكتب شرح واحد على الأقل');return;}
+  const pts=calcPts(topicsData.length),today=getTodayStr(),week=getWeekStr();
+  try{
+    await db.collection('tadabburin').add({uid:currentUser.uid,name:currentUserData.name,username:currentUserData.username,surahName:si.dataset.surahName,ayahNum:ai.value,ayahText:dp.dataset.ayahText||'',topics:topicsData,points:pts,createdAt:FS.serverTimestamp(),week,likesCount:0});
+    const nt=(currentUserData.points||0)+pts,nm=(currentUserData.monthlyPoints||0)+pts,b=getBadge(nm);
+    await db.collection('users').doc(currentUser.uid).update({points:nt,monthlyPoints:nm,totalPoints:FS.increment(pts),lastActiveDate:today,inactiveDays:0,badgeName:b.name,badgeIcon:b.icon});
+    currentUserData.points=nt;currentUserData.monthlyPoints=nm;currentUserData.lastActiveDate=today;
+    updateHeaderUI();
+    // شارة أول تدبّر
+    if(!currentUserData.firstTadabbur){
+      await db.collection('users').doc(currentUser.uid).update({firstTadabbur:true});
+      currentUserData.firstTadabbur=true;
+      setTimeout(()=>toast('🏅 حصلت على شارة أول تدبّر! شوفها في الـ Profile'),1500);
+    }
+    await db.collection('leaderboard_weekly').doc(`${week}_${currentUser.uid}`).set({uid:currentUser.uid,name:currentUserData.name,username:currentUserData.username,week,points:FS.increment(pts),badgeName:b.name,badgeIcon:b.icon},{merge:true});
+    // notification to all - curiosity style
+    await addNotification(`🌿 ${currentUserData.name} تدبّر اليوم — اكتشف ما تدبّره!`,'tadabbur');
+    loadNotifCount();
+    toast(`✓ تم الحفظ! +${pts} نقطة`);
+  }catch(e){console.error(e);toast('حدث خطأ أثناء الحفظ');}
+}
+
+// ══ WEEKLY POPUP ══
+async function checkWeeklyPopup(){
+  const week=getWeekStr(),key='mdb_lb_'+week;
+  if(localStorage.getItem(key))return;
+  const s=await db.collection('leaderboard_weekly').where('week','==',week).orderBy('points','desc').limit(3).get();
+  if(s.empty)return;
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lbPopupBody').innerHTML=s.docs.map((d,i)=>{const u=d.data(),me=currentUser&&u.uid===currentUser.uid;return`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eee${me?';background:var(--gold-pale);border-radius:8px;padding:10px':''}""><span style="font-size:1.5rem">${medals[i]}</span><div style="flex:1"><div style="font-weight:700">${u.name}${me?' 🎉':''}</div><div style="font-size:.75rem;color:var(--txt-lt)">@${u.username}</div></div><div style="font-weight:900;color:var(--gold)">${u.points} pts</div></div>`;}).join('');
+  document.getElementById('lbPopup').style.display='flex';
+  localStorage.setItem(key,'1');
+}
+function closeLbPopup(){document.getElementById('lbPopup').style.display='none';}
+
+// ══ SEND RANKS (Admin) ══
+async function sendRanksToAll(){
+  if(!isAdmin)return;
+  const week=getWeekStr();
+  const s=await db.collection('leaderboard_weekly').where('week','==',week).orderBy('points','desc').limit(3).get();
+  if(s.empty){toast('لا يوجد بيانات هذا الأسبوع');return;}
+  const medals=['🥇','🥈','🥉'];
+  const top=s.docs.map((d,i)=>{const u=d.data();return`${medals[i]} ${u.name} — ${u.points} pts`;}).join('\n');
+  const msg=`🏆 أبطال هذا الأسبوع:\n${top}`;
+  await addNotification(msg,'ranks');
+  toast('✓ تم إرسال الرانكات للجميع');
+  loadNotifCount();
+}
+
+// ══ PUBLIC WALL ══
+async function showPublicWall(){
+  showPage('publicWall');
+  document.getElementById('wallList').innerHTML='<div style="text-align:center;padding:40px;color:var(--txt-lt)">جارٍ التحميل...</div>';
+  const s=await db.collection('tadabburin').orderBy('createdAt','desc').limit(50).get();
+  if(s.empty){document.getElementById('wallList').innerHTML='<div class="empty-state"><div class="empty-state-icon">📖</div><div>لا يوجد تدبّر بعد</div></div>';return;}
+  const liked=JSON.parse(localStorage.getItem('mdb_likes')||'[]');
+  document.getElementById('wallList').innerHTML=s.docs.map(d=>{
+    const u=d.data(),id=d.id,date=u.createdAt?.toDate?.()?.toLocaleDateString('ar-EG')||'';
+    const tHTML=(u.topics||[]).map(t=>`<div style="margin-bottom:10px">${t.topic?`<span style="display:inline-block;background:var(--green);color:#fff;padding:3px 12px;border-radius:20px;font-size:.75rem;margin-bottom:6px">${t.topic}</span>`:''}<p style="font-size:.93rem;line-height:1.9">${t.explanation}</p></div>`).join('');
+    const lk=liked.includes(id);
+    const isMyPost=currentUser&&u.uid===currentUser.uid;
+    return`<div class="wall-card" id="wcard_${id}"><div class="wall-card-head"><div><div style="font-weight:700;color:#fff">${u.name}</div><div style="font-size:.75rem;color:rgba(255,255,255,.6)">@${u.username} · ${date}</div></div><div style="display:flex;align-items:center;gap:8px"><span class="verse-badge">+${u.points} pts</span>${isAdmin?`<button class="btn-red-sm" style="color:#fff;background:rgba(192,57,43,.4)" onclick="adminDeleteTadabbur('${id}')">🗑️</button>`:''}</div></div><div class="wall-card-body"><div style="font-family:'Amiri',serif;font-size:1.1rem;line-height:2;color:#1a3020;margin-bottom:14px;padding:12px 16px;background:var(--gold-pale);border-radius:8px;border-right:3px solid var(--gold)">سورة ${u.surahName} — الآية ${u.ayahNum}${u.ayahText?`<div style="margin-top:6px">${u.ayahText}</div>`:''}</div>${tHTML}<div style="margin-top:12px;display:flex;align-items:center;gap:10px"><button class="like-btn ${lk?'liked':''}" onclick="toggleLike('${id}',this,'${u.uid}','${u.name}')">${lk?'❤️':'🤍'} أعجبني</button><span id="lc_${id}" style="font-size:.8rem;color:var(--txt-lt)">${u.likesCount||0} إعجاب</span></div></div></div>`;
+  }).join('');
+}
+
+async function toggleLike(id,btn,ownerUid,ownerName){
+  if(!currentUser){toast('سجّل دخولك عشان تعجبك');return;}
+  const liked=JSON.parse(localStorage.getItem('mdb_likes')||'[]'),idx=liked.indexOf(id);
+  if(idx===-1){
+    liked.push(id);btn.innerHTML='❤️ أعجبني';btn.classList.add('liked');
+    await db.collection('tadabburin').doc(id).update({likesCount:FS.increment(1)});
+    const lc=document.getElementById('lc_'+id);if(lc)lc.textContent=((parseInt(lc.textContent)||0)+1)+' إعجاب';
+    // إشعار لصاحب التدبّر
+    if(ownerUid && ownerUid!==currentUser.uid){
+      await addNotificationToUser(ownerUid,'❤️ '+currentUserData.name+' أعجبه تدبّرك','like');
+    }
+  }else{
+    liked.splice(idx,1);btn.innerHTML='🤍 أعجبني';btn.classList.remove('liked');
+    await db.collection('tadabburin').doc(id).update({likesCount:FS.increment(-1)});
+    const lc=document.getElementById('lc_'+id);if(lc)lc.textContent=(Math.max(0,(parseInt(lc.textContent)||1)-1))+' إعجاب';
+  }
+  localStorage.setItem('mdb_likes',JSON.stringify(liked));
+}
+
+// ══ LEADERBOARD ══
+async function showLeaderboard(){
+  showPage('leaderboardView');
+  if(isAdmin)document.getElementById('adminSendRanksBtn').style.display='block';
+  const week=getWeekStr();
+  const s=await db.collection('leaderboard_weekly').where('week','==',week).orderBy('points','desc').limit(20).get();
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lbList').innerHTML=s.empty?'<div style="text-align:center;padding:40px;color:var(--txt-lt)">لا يوجد بيانات هذا الأسبوع بعد</div>':s.docs.map((d,i)=>{const u=d.data(),me=currentUser&&u.uid===currentUser.uid;return`<div class="lb-row ${me?'lb-me':''}"><div class="lb-rank">${medals[i]||i+1}</div><div style="flex:1"><div style="font-weight:700">${u.name}${me?' (أنت)':''}</div><div style="font-size:.75rem;color:var(--txt-lt)">@${u.username} · ${u.badgeIcon||''} ${u.badgeName||''}</div></div><div style="font-weight:900;color:var(--gold)">${u.points} pts</div></div>`;}).join('');
+}
+
+// ══ PROFILE ══
+async function showProfile(){
+  if(!currentUser){toast('سجّل دخولك أولاً');return;}
+  showPage('profileView');
+  const b=getBadge(currentUserData.monthlyPoints||0);
+  const avatarColor=getAvatarColor(currentUserData.name||'م');
+  const firstLetter=(currentUserData.name||'م')[0];
+  document.getElementById('profileAvatar').style.background=avatarColor;
+  document.getElementById('profileAvatar').textContent=firstLetter;
+  document.getElementById('profileName').textContent=currentUserData.name||'';
+  document.getElementById('profileUsername').textContent='@'+(currentUserData.username||'');
+  const joined=currentUserData.createdAt?.toDate?.()?.toLocaleDateString('ar-EG')||'';
+  document.getElementById('profileJoined').textContent=joined?`انضم في ${joined}`:'';
+  document.getElementById('profilePoints').textContent=currentUserData.totalPoints||currentUserData.points||0;
+  document.getElementById('profileBadgeIcon').textContent=b.icon;
+  document.getElementById('profileBadgeName').textContent=b.name;
+  if(currentUserData.firstTadabbur) document.getElementById('firstTadBadge').style.display='block';
+  document.getElementById('editEmail').value=currentUserData.email||'';
+  // load tadabbur count + likes
+  const [tadSnap]=await Promise.all([db.collection('tadabburin').where('uid','==',currentUser.uid).get()]);
+  document.getElementById('profileTadCount').textContent=tadSnap.size;
+  let totalLikes=0;tadSnap.docs.forEach(d=>totalLikes+=(d.data().likesCount||0));
+  document.getElementById('profileLikes').textContent=totalLikes;
+  // my tadabbur list
+  if(tadSnap.empty){document.getElementById('myTadList').innerHTML='<div class="empty-state"><div class="empty-state-icon">📖</div><div>لم تتدبّر بعد</div></div>';return;}
+  const sorted=tadSnap.docs.sort((a,b)=>b.data().createdAt?.seconds-a.data().createdAt?.seconds);
+  document.getElementById('myTadList').innerHTML=sorted.map(d=>{
+    const u=d.data(),date=u.createdAt?.toDate?.()?.toLocaleDateString('ar-EG')||'';
+    return`<div class="wall-card" style="margin-bottom:14px"><div class="wall-card-head"><div><div style="color:#fff;font-weight:700">سورة ${u.surahName} — الآية ${u.ayahNum}</div><div style="font-size:.75rem;color:rgba(255,255,255,.6)">${date} · +${u.points} pts</div></div><span style="color:var(--gold-lt);font-size:.8rem">${u.likesCount||0} ❤️</span></div><div class="wall-card-body">${(u.topics||[]).map(t=>`<div style="margin-bottom:8px">${t.topic?`<span style="font-size:.75rem;background:var(--green);color:#fff;padding:2px 10px;border-radius:20px;margin-bottom:4px;display:inline-block">${t.topic}</span>`:''}<p style="font-size:.9rem;line-height:1.8">${t.explanation}</p></div>`).join('')}</div></div>`;
+  }).join('');
+}
+
+async function updateUsername(){
+  const newU=document.getElementById('editUsername').value.trim();
+  if(!newU){toast('اكتب اسم المستخدم الجديد');return;}
+  if(newU===currentUserData.username){toast('نفس اسم المستخدم الحالي');return;}
+  const uq=await db.collection('users').where('username','==',newU).get();
+  if(!uq.empty){toast('اسم المستخدم مستخدم بالفعل');return;}
+  await db.collection('users').doc(currentUser.uid).update({username:newU});
+  currentUserData.username=newU;
+  document.getElementById('profileUsername').textContent='@'+newU;
+  document.getElementById('editUsername').value='';
+  toast('✓ تم تحديث اسم المستخدم');
+}
+
+async function sendPassReset(){
+  const email=document.getElementById('editEmail').value.trim();
+  if(!email){toast('اكتب إيميلك أولاً');return;}
+  try{await auth.sendPasswordResetEmail(email);toast('✓ تم إرسال رابط تغيير كلمة السر');}
+  catch(e){toast('خطأ: '+fbErr(e.code));}
+}
+
+// ══ ADMIN ══
+async function showAdminPanel(){
+  if(!isAdmin){toast('غير مصرح لك');return;}
+  showPage('adminPanel');
+  const [us,ts]=await Promise.all([db.collection('users').get(),db.collection('tadabburin').get()]);
+  document.getElementById('adminUsersCount').textContent=us.size;
+  document.getElementById('adminTadCount').textContent=ts.size;
+  allUsersCache=us.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('adminUsersList').innerHTML=allUsersCache.map(u=>`<div class="admin-user-row"><input type="checkbox" class="user-checkbox user-select-cb" data-uid="${u.id}" data-email="${u.email||''}"><div style="flex:1"><div style="font-weight:700">${u.name}</div><div style="font-size:.75rem;color:var(--txt-lt)">@${u.username} · ${u.email}</div><div style="font-size:.75rem;color:var(--gold)">${u.badgeIcon||''} ${u.badgeName||''} · ${u.points||0} pts</div></div><button class="btn-red-sm" onclick="adminDeleteUser('${u.id}','${u.name}')">حذف</button></div>`).join('');
+}
+
+function toggleSelectAll(cb){document.querySelectorAll('.user-select-cb').forEach(c=>c.checked=cb.checked);}
+
+async function adminSendToAll(){
+  const msg=document.getElementById('adminMsgInput').value.trim();
+  if(!msg)return;
+  await db.collection('admin_messages').add({message:msg,createdAt:FS.serverTimestamp()});
+  await addNotification('📢 من الأدمن: '+msg,'admin');
+  document.getElementById('adminMsgInput').value='';
+  toast('✓ تم الإرسال للجميع');
+  loadNotifCount();
+}
+
+async function adminSendToSelected(){
+  const msg=document.getElementById('adminMsgInput').value.trim();
+  if(!msg){toast('اكتب الرسالة أولاً');return;}
+  const selected=[];
+  document.querySelectorAll('.user-select-cb:checked').forEach(cb=>selected.push(cb.dataset.uid));
+  if(!selected.length){toast('اختر مستخدماً واحداً على الأقل');return;}
+  // save as notification targeted
+  await db.collection('notifications').add({message:'📢 من الأدمن: '+msg,type:'admin_targeted',targetUids:selected,week:getWeekStr(),createdAt:FS.serverTimestamp()});
+  document.getElementById('adminMsgInput').value='';
+  document.querySelectorAll('.user-select-cb').forEach(c=>c.checked=false);
+  document.getElementById('selectAllUsers').checked=false;
+  toast(`✓ تم الإرسال لـ ${selected.length} مستخدم`);
+}
+
+function adminDeleteTadabbur(id){
+  showModal({icon:'🗑️',title:'حذف التدبّر',sub:'هل تريد حذف هذا التدبّر نهائياً؟',btns:[
+    {label:'نعم احذف',cls:'btn-red-sm',action:async()=>{
+      await db.collection('tadabburin').doc(id).delete();
+      document.getElementById('wcard_'+id)?.remove();
+      closeModalNow();toast('تم الحذف');
+    }},
+    {label:'إلغاء',cls:'btn btn-ghost btn-sm',action:closeModalNow}
+  ]});
+}
+
+function distributeTadabbur(){
+  const from=parseInt(document.getElementById('distFrom').value);
+  const to=parseInt(document.getElementById('distTo').value);
+  if(!from||!to||from>to){toast('ادخل رقم صفحة صحيح');return;}
+
+  const selected=[];
+  document.querySelectorAll('.user-select-cb:checked').forEach(cb=>{
+    const row=cb.closest('.admin-user-row');
+    const name=row.querySelector('div>div:first-child').textContent.trim();
+    selected.push(name);
+  });
+  if(!selected.length){toast('اختر مستخدماً واحداً على الأقل');return;}
+
+  // توزيع الصفحات
+  const totalPages=to-from+1;
+  const pagesPerUser=Math.floor(totalPages/selected.length);
+  const extraPages=totalPages%selected.length;
+
+  // خلط المواضيع الـ 15 عشوائياً وتوزيعها بالتساوي
+  const shuffledTopics=[...topics].sort(()=>Math.random()-.5);
+  const topicsPerUser=Math.floor(shuffledTopics.length/selected.length);
+  const extraTopics=shuffledTopics.length%selected.length;
+
+  // اختيار عشوائي للمستخدمين اللي هياخدوا موضوع إضافي
+  const extraTopicUsers=new Set();
+  while(extraTopicUsers.size<extraTopics){
+    extraTopicUsers.add(Math.floor(Math.random()*selected.length));
+  }
+
+  let pageStart=from;
+  let topicStart=0;
+  let result='🗂️ توزيع التدبّر\n';
+  result+='━━━━━━━━━━━━━━━━━━\n';
+
+  selected.forEach((name,i)=>{
+    // صفحات
+    const pages=pagesPerUser+(i<extraPages?1:0);
+    const pageEnd=pageStart+pages-1;
+
+    // مواضيع
+    const tCount=topicsPerUser+(extraTopicUsers.has(i)?1:0);
+    const userTopics=shuffledTopics.slice(topicStart,topicStart+tCount);
+
+    result+=`👤 ${name}\n`;
+    result+=`📄 الصفحات: ${pageStart} → ${pageEnd}\n`;
+    if(userTopics.length===1){
+      result+=`🌿 الموضوع: ${userTopics[0]}\n`;
+    } else {
+      result+=`🌿 المواضيع:\n`;
+      userTopics.forEach((t,j)=>result+=`   ${j+1}. ${t}\n`);
+    }
+    result+='─────────────────\n';
+
+    pageStart=pageEnd+1;
+    topicStart+=tCount;
+  });
+
+  document.getElementById('distResultBody').textContent=result;
+  document.getElementById('distResult').style.display='block';
+}
+
+function copyDistResult(){
+  const text=document.getElementById('distResultBody').textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('✓ تم النسخ — جاهز للواتساب!')).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✓ تم النسخ!');
+  });
+}
+
+function adminDeleteUser(uid,name){
+  showModal({icon:'⚠️',title:`حذف ${name}`,sub:'هل تريد حذف هذا المستخدم؟',btns:[
+    {label:'نعم احذف',cls:'btn-red-sm',action:async()=>{await db.collection('users').doc(uid).delete();closeModalNow();showAdminPanel();toast('تم الحذف');}},
+    {label:'إلغاء',cls:'btn btn-ghost btn-sm',action:closeModalNow}
+  ]});
+}
+
+async function loadAdminMessages(){
+  try{
+    const s=await db.collection('admin_messages').orderBy('createdAt','desc').limit(1).get();
+    if(!s.empty){const m=s.docs[0].data().message,k='mdb_msg_'+s.docs[0].id;if(!localStorage.getItem(k)){document.getElementById('adminMsgBanner').textContent='📢 '+m;document.getElementById('adminMsgBanner').style.display='block';localStorage.setItem(k,'1');}}
+  }catch{}
+}
+
+// ══ NAV ══
+function setNavActive(btn){document.querySelectorAll('.nav-btn').forEach(b=>{if(b.id!=='adminBtn')b.classList.remove('active');});btn.classList.add('active');}
+function showPage(id){document.getElementById('mainView').style.display='none';document.getElementById(id).style.display='block';}
+function hidePage(id){document.getElementById(id).style.display='none';document.getElementById('mainView').style.display='block';}
+function hideTopicsView(){hidePage('topicsView');refreshSelects();}
+
+// ══ TOPICS ══
+function showTopicsView(){showPage('topicsView');renderTopics();}
+function renderTopics(){document.getElementById('topicsManageList').innerHTML=topics.length===0?'<div style="text-align:center;color:var(--txt-lt);padding:30px">لا توجد مواضيع</div>':topics.map((t,i)=>`<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--paper);border:1px solid var(--border);border-radius:10px;margin-bottom:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;display:inline-block"></span><span style="flex:1;font-size:.95rem">${t}</span><button class="btn-red-sm" onclick="deleteTopic(${i})">✕</button></div>`).join('');}
+function addTopic(){const v=document.getElementById('newTopicInput').value.trim();if(!v){toast('اكتب اسم الموضوع أولاً');return;}if(topics.includes(v)){toast('هذا الموضوع موجود بالفعل');return;}topics.push(v);document.getElementById('newTopicInput').value='';saveToLS('mdb_topics',topics);renderTopics();toast('تمت الإضافة ✓');}
+function deleteTopic(i){showModal({icon:'🗑️',title:'حذف الموضوع',sub:`حذف "${topics[i]}"؟`,btns:[{label:'احذف',cls:'btn-red-sm',action:()=>{topics.splice(i,1);saveToLS('mdb_topics',topics);renderTopics();closeModalNow();toast('تم الحذف');}},{label:'إلغاء',cls:'btn btn-ghost btn-sm',action:closeModalNow}]});}
+function refreshSelects(){document.querySelectorAll('.topic-select').forEach(s=>{const c=s.value;s.innerHTML=`<option value="">— اختر الموضوع —</option>`+topics.map(t=>`<option value="${t}">${t}</option>`).join('');s.value=c;});}
+
+// ══ VERSE CARDS ══
+function buildTopicEntryHTML(removable){return `<div class="topic-entry"><div class="topic-entry-header"><span class="topic-entry-title">الموضوع</span>${removable?`<button class="btn-red-sm" onclick="removeTopicEntry(this)">✕</button>`:''}</div><select class="topic-select" onchange="autoSave()"><option value="">— اختر الموضوع —</option>${topics.map(t=>`<option value="${t}">${t}</option>`).join('')}</select><label class="field-label" style="margin-top:4px">📝 الشرح</label><textarea class="explanation-textarea" placeholder="اكتب شرحك وتدبرك هنا..." oninput="autoSave()"></textarea></div>`;}
+
+function addVerseCard(data){
+  cardCounter++;const id='vc_'+cardCounter;const el=document.createElement('div');el.className='verse-card';el.id=id;
+  el.innerHTML=`<div class="verse-card-head"><span class="verse-card-head-label">آية رقم ${cardCounter}</span><span class="verse-badge">القرآن الكريم</span><button class="btn btn-sm" style="background:rgba(255,255,255,.12);color:#fff;border:none" onclick="removeVerseCard('${id}')">✕ حذف</button></div>
+  <div class="verse-card-body">
+    <label class="field-label">📖 اسم السورة</label>
+    <div class="surah-wrap"><input type="text" class="surah-input" placeholder="ابحث واختر السورة..." autocomplete="off" oninput="filterSurahs(this)" onfocus="openDrop(this)" onblur="closeDrop(this)" data-surah-num="" data-surah-name=""><div class="surah-drop">${ALL_SURAHS.map(s=>`<div class="surah-opt" data-num="${s.n}" data-name="${s.name}" onmousedown="selectSurah(this)"><span>${s.name}</span><span class="surah-opt-num">${s.n}</span></div>`).join('')}</div></div>
+    <label class="field-label">🔢 رقم الآية</label>
+    <input type="number" class="ayah-num-input" placeholder="رقم" min="1" style="display:block" oninput="schedFetch(this.closest('.verse-card'))">
+    <div class="verse-display" data-ayah-text=""><span style="color:#bbb;font-family:'Cairo',sans-serif;font-size:.88rem">سيظهر نص الآية هنا تلقائياً</span></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0 14px"><span style="font-size:.75rem;font-weight:700;color:var(--txt-lt);text-transform:uppercase;white-space:nowrap">الموضوع والشرح</span><div style="flex:1;height:1px;background:var(--border)"></div></div>
+    <div class="topics-container">${buildTopicEntryHTML(false)}</div>
+    <button class="btn btn-outline-green btn-sm" onclick="addTopicEntry(this)" style="margin-top:4px">＋ إضافة موضوع آخر</button>
+  </div>
+  <div class="card-footer"><span style="font-size:.78rem;color:var(--txt-lt)">✓ يُحفظ محلياً تلقائياً</span><div style="display:flex;gap:8px"><button class="btn btn-green btn-sm" onclick="saveTadabburToFirebase(this.closest('.verse-card'))">☁ حفظ ومشاركة</button><button class="btn-red-sm" onclick="removeVerseCard('${id}')">✕ حذف</button></div></div>`;
+  const ec=document.getElementById('versesContainer');const es=ec.querySelector('.empty-state');if(es)es.remove();
+  ec.appendChild(el);if(data)restoreCard(el,data);autoSave();return el;
+}
+
+function removeVerseCard(id){showModal({icon:'🗑️',title:'حذف الآية',sub:'تأكيد الحذف؟',btns:[{label:'احذف',cls:'btn-red-sm',action:()=>{document.getElementById(id)?.remove();updateEmpty();autoSave();closeModalNow();toast('تم الحذف');}},{label:'إلغاء',cls:'btn btn-ghost btn-sm',action:closeModalNow}]});}
+function addTopicEntry(btn){const c=btn.previousElementSibling;const d=document.createElement('div');d.innerHTML=buildTopicEntryHTML(true);c.appendChild(d.firstElementChild);autoSave();}
+function removeTopicEntry(btn){const e=btn.closest('.topic-entry'),c=e.closest('.topics-container');if(c.querySelectorAll('.topic-entry').length<=1){toast('يجب أن يبقى موضوع واحد');return;}e.remove();autoSave();}
+function updateEmpty(){const c=document.getElementById('versesContainer');if(!c.querySelector('.verse-card')){const d=document.createElement('div');d.className='empty-state';d.innerHTML='<div class="empty-state-icon">📖</div><div style="font-weight:700;margin-bottom:8px">لا توجد آيات بعد</div><div style="font-size:.88rem">اضغط "إضافة آية جديدة" للبدء</div>';c.appendChild(d);}}
+
+// ══ SURAH SEARCH ══
+function filterSurahs(input){const v=input.value.trim(),drop=input.nextElementSibling;let found=0;drop.querySelectorAll('.surah-opt').forEach(o=>{const m=!v||o.dataset.name.includes(v);o.style.display=m?'':'none';if(m)found++;});let nr=drop.querySelector('.no-results');if(found===0){if(!nr){nr=document.createElement('div');nr.className='no-results';nr.style.cssText='padding:14px 16px;color:var(--txt-lt);font-size:.88rem;text-align:center';nr.textContent='لا توجد نتائج';drop.appendChild(nr);}}else{nr?.remove();}drop.classList.add('open');}
+function openDrop(input){input.nextElementSibling.querySelectorAll('.surah-opt').forEach(o=>o.style.display='');input.nextElementSibling.querySelector('.no-results')?.remove();input.nextElementSibling.classList.add('open');}
+function closeDrop(input){setTimeout(()=>{input.nextElementSibling.classList.remove('open');if(!input.dataset.surahNum)input.value='';},180);}
+function selectSurah(opt){const drop=opt.closest('.surah-drop'),input=drop.previousElementSibling;input.value=opt.dataset.name;input.dataset.surahNum=opt.dataset.num;input.dataset.surahName=opt.dataset.name;drop.querySelectorAll('.surah-opt').forEach(o=>o.classList.remove('active'));opt.classList.add('active');drop.classList.remove('open');schedFetch(input.closest('.verse-card'));autoSave();}
+let fetchTimers={};
+function schedFetch(card){clearTimeout(fetchTimers[card.id]);fetchTimers[card.id]=setTimeout(()=>fetchAyah(card),600);}
+async function fetchAyah(card){
+  const si=card.querySelector('.surah-input'),ai=card.querySelector('.ayah-num-input'),dp=card.querySelector('.verse-display');
+  if(!si.dataset.surahNum||!ai.value||parseInt(ai.value)<1)return;
+  dp.innerHTML='<span style="color:#bbb;font-family:Cairo,sans-serif;font-size:.88rem">جارٍ التحميل...</span>';dp.dataset.ayahText='';
+  try{const r=await fetch(`https://api.alquran.cloud/v1/ayah/${si.dataset.surahNum}:${ai.value}`);const j=await r.json();if(j.code===200&&j.data?.text){dp.innerHTML=`<span style="color:var(--gold-lt)">❧</span> ${j.data.text} <span style="color:var(--gold-lt)">❧</span>`;dp.dataset.ayahText=j.data.text;}else dp.innerHTML='<span style="color:var(--red);font-family:Cairo,sans-serif;font-size:.88rem">⚠ الآية غير موجودة</span>';}
+  catch{dp.innerHTML='<span style="color:var(--red);font-family:Cairo,sans-serif;font-size:.88rem">⚠ تعذّر الاتصال</span>';}
+  autoSave();
+}
+
+// ══ AUTO SAVE ══
+function autoSave(){
+  clearTimeout(saveTimer);saveTimer=setTimeout(()=>{
+    saveToLS('mdb_topics',topics);
+    const cards=[];document.querySelectorAll('.verse-card').forEach(c=>{const si=c.querySelector('.surah-input'),ai=c.querySelector('.ayah-num-input'),dp=c.querySelector('.verse-display');const ts=[];c.querySelectorAll('.topic-entry').forEach(e=>ts.push({topic:e.querySelector('.topic-select')?.value||'',explanation:e.querySelector('.explanation-textarea')?.value||''}));cards.push({surahNum:si?.dataset.surahNum||'',surahName:si?.dataset.surahName||'',surahDisplay:si?.value||'',ayahNum:ai?.value||'',ayahText:dp?.dataset.ayahText||'',topics:ts});});
+    saveToLS('mdb_cards',cards);
+  },400);
+}
+
+function restoreCard(card,data){
+  const si=card.querySelector('.surah-input'),ai=card.querySelector('.ayah-num-input'),dp=card.querySelector('.verse-display');
+  if(data.surahName){si.value=data.surahDisplay;si.dataset.surahNum=data.surahNum;si.dataset.surahName=data.surahName;}
+  if(data.ayahNum)ai.value=data.ayahNum;
+  if(data.ayahText){dp.innerHTML=`<span style="color:var(--gold-lt)">❧</span> ${data.ayahText} <span style="color:var(--gold-lt)">❧</span>`;dp.dataset.ayahText=data.ayahText;}
+  if(data.topics?.length){const c=card.querySelector('.topics-container');c.innerHTML='';data.topics.forEach((t,i)=>{const d=document.createElement('div');d.innerHTML=buildTopicEntryHTML(i>0);const e=d.firstElementChild;c.appendChild(e);e.querySelector('.topic-select').value=t.topic;e.querySelector('.explanation-textarea').value=t.explanation;});}
+}
+
+// ══ RESET ══
+function confirmReset(){showModal({icon:'↺',title:'تحديث — بدء جديد',sub:'سيتم مسح جميع الآيات.',btns:[{label:'نعم ابدأ من جديد',cls:'btn btn-gold btn-sm',action:()=>{localStorage.removeItem('mdb_cards');document.getElementById('versesContainer').innerHTML='';cardCounter=0;addVerseCard();closeModalNow();toast('تم التحديث');}},{label:'إلغاء',cls:'btn btn-ghost btn-sm',action:closeModalNow}]});}
+
+// ══ MODAL ══
+function showModal({icon,title,sub,btns}){document.getElementById('modalIcon').textContent=icon;document.getElementById('modalTitle').textContent=title;document.getElementById('modalSub').textContent=sub;const el=document.getElementById('modalBtns');el.innerHTML='';btns.forEach(b=>{const btn=document.createElement('button');btn.className=b.cls;btn.textContent=b.label;btn.onclick=b.action;el.appendChild(btn);});document.getElementById('modalOverlay').style.display='flex';}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalNow();}
+function closeModalNow(){document.getElementById('modalOverlay').style.display='none';}
+
+// ══ PDF ══
+async function downloadPDF(){
+  const cards=document.querySelectorAll('.verse-card');if(!cards.length){toast('لا توجد آيات');return;}
+  document.getElementById('pdfProgress').style.display='flex';
+  const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});let first=true;
+  for(const card of cards){
+    const si=card.querySelector('.surah-input'),ai=card.querySelector('.ayah-num-input'),dp=card.querySelector('.verse-display');
+    if(!si.dataset.surahName||!ai.value)continue;
+    let tHTML='';card.querySelectorAll('.topic-entry').forEach(e=>{const tn=e.querySelector('.topic-select')?.value,ex=e.querySelector('.explanation-textarea')?.value?.trim();if(ex)tHTML+=`<div style="margin-bottom:22px;direction:rtl">${tn?`<div style="display:inline-block;background:#1e5c45;color:#fff;padding:7px 18px;border-radius:6px;font-size:14px;font-weight:700;margin-bottom:10px;font-family:Cairo,sans-serif">${tn}</div>`:''}<div style="background:#faf7f2;border-right:4px solid #b8883a;padding:16px 20px;border-radius:8px;font-size:15px;line-height:2.1;color:#333;font-family:Cairo,sans-serif">${ex.replace(/\n/g,'<br>')}</div></div>`;});
+    const pg=document.createElement('div');pg.style.cssText='width:794px;min-height:1122px;background:#faf7f2;padding:0;font-family:Cairo,sans-serif;direction:rtl;position:relative;overflow:hidden';
+    pg.innerHTML=`<div style="background:linear-gradient(135deg,#0f2e1e,#1e5c45);height:10px"></div><div style="background:linear-gradient(135deg,#1a3d2c,#1e5c45);padding:26px 50px 20px;text-align:center;border-bottom:3px solid #b8883a"><div style="font-family:Amiri,serif;font-size:22px;color:#d4aa6a;margin-bottom:8px">﷽</div><div style="font-size:12px;color:rgba(255,255,255,.55);letter-spacing:5px;font-family:Cairo,sans-serif">MUDABBIR</div></div><div style="padding:24px 50px 0;text-align:center"><div style="display:inline-block;background:#fff;border:2px solid #e0d5c4;padding:12px 36px;border-radius:40px"><span style="font-size:17px;font-weight:900;color:#1e5c45;font-family:Cairo,sans-serif">سورة ${si.dataset.surahName}</span><span style="color:#c9a870;font-size:16px;margin:0 12px">✦</span><span style="font-size:15px;color:#7a7060;font-family:Cairo,sans-serif">الآية ${ai.value}</span></div></div><div style="margin:22px 50px 24px;background:linear-gradient(135deg,#f7f0e4,#ede4d0);border:1px solid #d9c9a8;border-radius:16px;padding:28px 36px;text-align:center"><div style="color:#c9a870;font-size:18px;margin-bottom:8px">❝</div><div style="font-family:Amiri,serif;font-size:26px;line-height:2.5;color:#1a3020">${dp.dataset.ayahText||'—'}</div><div style="color:#c9a870;font-size:18px;margin-top:8px">❞</div></div><div style="margin:0 50px 20px;border-bottom:1px solid #e0d5c4;padding-bottom:8px;text-align:center;font-size:11px;font-weight:700;color:#b8883a;letter-spacing:2px;font-family:Cairo,sans-serif">التدبّر والشرح</div><div style="padding:4px 50px 90px">${tHTML||'<div style="text-align:center;color:#bbb;padding:20px;font-family:Cairo,sans-serif">لم يُضَف شرح</div>'}</div><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0f2e1e,#1e5c45);padding:13px 50px;display:flex;justify-content:space-between;align-items:center"><span style="color:rgba(255,255,255,.5);font-size:11px;font-family:Cairo,sans-serif">سورة ${si.dataset.surahName} — الآية ${ai.value}</span><span style="color:#b8883a">✦</span><span style="color:rgba(255,255,255,.38);font-size:10px;font-family:Cairo,sans-serif">Powered by Ahmed Hager</span></div>`;
+    document.getElementById('pdfHidden').appendChild(pg);await new Promise(r=>setTimeout(r,350));
+    try{const cv=await html2canvas(pg,{scale:1.8,useCORS:true,backgroundColor:'#faf7f2',logging:false});if(!first)pdf.addPage();pdf.addImage(cv.toDataURL('image/jpeg',.93),'JPEG',0,0,pdf.internal.pageSize.getWidth(),pdf.internal.pageSize.getHeight());first=false;}catch(e){console.error(e);}
+    document.getElementById('pdfHidden').innerHTML='';
+  }
+  document.getElementById('pdfProgress').style.display='none';
+  if(!first){pdf.save('مدبر-القرآن.pdf');toast('تم التحميل ✓');}else toast('أدخل بيانات آية واحدة على الأقل');
+}
+
+// ══ INIT ══
+function initApp(){
+  if(document.getElementById('versesContainer').children.length>0)return;
+  const saved=JSON.parse(localStorage.getItem('mdb_cards')||'null');
+  topics=JSON.parse(localStorage.getItem('mdb_topics')||'null')||[...DEFAULT_TOPICS];
+  if(saved?.length)saved.forEach(d=>addVerseCard(d));else addVerseCard();
+}
+</script>
+</body>
+</html>
